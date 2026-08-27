@@ -61,6 +61,9 @@ def parse_card(text):
             m = re.search(r"([\d.]+)", line)
             if m:
                 current_match["score"] = float(m.group(1))
+            # Also grab a label if it accidentally got glued onto the same line
+            if ">" in line:
+                current_match["label"] = line.split(">", 1)[1].strip()
         elif line.startswith(">") and current_match:
             current_match["label"] = line[1:].strip()
 

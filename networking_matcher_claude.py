@@ -379,9 +379,9 @@ def write_match(f, i, j, score):
     label = labels.get(pair)
     s = edge_details[pair]
     f.write(f"**{people[j]['name']}** \u2014 *{people[j]['institution']}*  \n")
-    f.write(f"Score: {score:.2f} ")
+    f.write(f"Score: {score:.2f} \n")
     if label:
-        f.write(f"> {label}\n")
+        f.write(f"\n> {label}\n")
     f.write("\n")
  
 with open(f"{OUTPUT_DIR}/match_cards.md", "w") as f:

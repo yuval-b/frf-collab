@@ -29,8 +29,8 @@ import requests
 from sentence_transformers import SentenceTransformer
 from itertools import combinations
 
-
-
+# Load API key
+exec(open("api_key.py").read())
 
 # ============================================================
 # CONFIGURATION  --  edit this block for your data
@@ -298,25 +298,31 @@ for i in attending_ids:
 # ============================================================
  
 def label_prompt(pa, pb, scores):
-    return f"""Two researchers at a networking event. Write ONE sentence (max 30 words) explaining why they should meet. Be specific about their actual work \u2014 name the technique, topic, or need. Avoid generic phrases like "shared interests" or "could collaborate".
- 
+    return f"""Two researchers at a networking event. Suggest why they should meet.
+
+CRITICAL RULES:
+1. Identify the SINGLE strongest concrete overlap. Do NOT stitch together weak connections across unrelated fields.
+2. Do NOT invent links between unrelated topics. Example of what NOT to do: if Person A is an astrophysicist whose side project is investing, and Person B knows finance — the connection is investing. Do NOT link astrophysics to finance.
+3. If the strongest overlap is genuinely modest, be honest: "Both work on X, though in different domains" is fine. Better an honest weak match than a fabricated strong one.
+4. Be specific — name the actual technique, topic, project, or skill. Don't say "could collaborate".
+5. One sentence, max 26 words, no preamble.
+
 PERSON A: {pa['name']} ({pa['institution']})
 - Specialty/keywords: {pa['interests']}
-- Offers (skills, expertise, connections): {pa['offers']}
-- Looking for: {pa['looking_for']}
+- Skills/expertise/connections: {pa['offers']}
+- Looking for collaborators in: {pa['looking_for']}
 - Wants to learn: {pa['wants_to_learn']}
-- Side project idea: {pa['side_project']}
- 
+- Side project: {pa['side_project']}
+
 PERSON B: {pb['name']} ({pb['institution']})
 - Specialty/keywords: {pb['interests']}
-- Offers (skills, expertise, connections): {pb['offers']}
-- Looking for: {pb['looking_for']}
+- Skills/expertise/connections: {pb['offers']}
+- Looking for collaborators in: {pb['looking_for']}
 - Wants to learn: {pb['wants_to_learn']}
-- Side project idea: {pb['side_project']}
- 
-Facet scores: interests={scores['interests']:.2f}, complementarity={scores['complementarity']:.2f}, skill_exchange={scores['skill_exchange']:.2f}
- 
-Reply with just the sentence, no preamble."""
+- Side project: {pb['side_project']}
+
+Facet scores (guide only, don't quote): interests={scores['interests']:.2f}, complementarity={scores['complementarity']:.2f}, skill_exchange={scores['skill_exchange']:.2f}
+"""
  
 def call_claude(prompt: str) -> str:
     """Direct HTTP call to the Anthropic messages API. Bypasses the SDK/httpx2 stack."""

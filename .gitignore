@@ -1,5 +1,6 @@
 api_key.py
 responses.csv
 output/match_cards*
+!output/match_cards_locked.html
 ~$*
 .DS_Store

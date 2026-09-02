@@ -131,7 +131,7 @@ net.set_options("""
 
 for name in G.nodes():
     data = G.nodes[name]
-    attending = data["attending"]
+    #attending = data["attending"]
 
     # Rich tooltip
     top3 = top_matches_lookup.get(name, [])
@@ -141,7 +141,7 @@ for name in G.nodes():
     tooltip = (
         f"{name}\n"
         f"{data['institution']}\n"
-        f"{'Attending' if attending else 'Not attending'}\n\n"
+        #f"{'Attending' if attending else 'Not attending'}\n\n"
         f"Top matches:\n" +
         "\n".join(f"  • {other} ({s:.2f})" for other, s in top3)
     )
@@ -150,9 +150,9 @@ for name in G.nodes():
         name,
         label=name,
         title=tooltip,
-        color=COLOUR_ATTENDING if attending else COLOUR_NOT_ATTENDING,
-        size=28 if attending else 16,
-        borderWidth=2 if attending else 1,
+        color=COLOUR_ATTENDING,
+        size=28,
+        borderWidth=2,
     )
 
 for u, v, d in G.edges(data=True):
@@ -191,28 +191,19 @@ for (u, v), w, a in zip(G.edges(), edge_widths, edge_alphas):
     )
 
 # Nodes: attending vs not
-attending_nodes = [n for n, d in G.nodes(data=True) if d["attending"]]
-absent_nodes    = [n for n, d in G.nodes(data=True) if not d["attending"]]
+nodes = [n for n, d in G.nodes(data=True)]
+#absent_nodes    = [n for n, d in G.nodes(data=True) if not d["attending"]]
 
 nx.draw_networkx_nodes(
-    G, pos, nodelist=attending_nodes,
+    G, pos, nodelist=nodes,
     node_color=COLOUR_ATTENDING, node_size=650,
     alpha=0.95, edgecolors="white", linewidths=2, ax=ax,
-)
-nx.draw_networkx_nodes(
-    G, pos, nodelist=absent_nodes,
-    node_color=COLOUR_NOT_ATTENDING, node_size=280,
-    alpha=0.5, edgecolors="white", linewidths=1, ax=ax,
 )
 
 # Labels: only for attending (keeps the figure readable at print scale)
 nx.draw_networkx_labels(
-    G, pos, labels={n: n for n in attending_nodes},
+    G, pos, labels={n: n for n in nodes},
     font_size=9, font_color="#111", font_weight="bold", ax=ax,
-)
-nx.draw_networkx_labels(
-    G, pos, labels={n: n for n in absent_nodes},
-    font_size=7, font_color="#555", ax=ax,
 )
 
 logo = Image.open("logo.png")
@@ -230,11 +221,11 @@ ax.add_artist(annotation)
 ax.axis("off")
 ax.set_title("Forrest Research Foundation Networking Map", fontsize=18, pad=20, weight="bold")
 
-legend_elements = [
-    mpatches.Patch(color=COLOUR_ATTENDING, label=f"Attending ({len(attending_nodes)})"),
-    mpatches.Patch(color=COLOUR_NOT_ATTENDING, label=f"Not attending ({len(absent_nodes)})"),
-]
-ax.legend(handles=legend_elements, loc="upper left", frameon=False, fontsize=11)
+# legend_elements = [
+#     mpatches.Patch(color=COLOUR_ATTENDING, label=f"Attending ({len(attending_nodes)})"),
+#     mpatches.Patch(color=COLOUR_NOT_ATTENDING, label=f"Not attending ({len(absent_nodes)})"),
+# ]
+# ax.legend(handles=legend_elements, loc="upper left", frameon=False, fontsize=11)
 
 plt.tight_layout()
 plt.savefig(

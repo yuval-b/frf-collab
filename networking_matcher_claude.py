@@ -55,7 +55,7 @@ COLUMN_MAP = {
 }
  
 # Values in the RSVP column that count as "attending"
-RSVP_YES_VALUES = {"yes", "unknown"}
+RSVP_YES_VALUES = {"yes", "unknown","no"}
  
 WEIGHTS = {
     "interests":       0.40,
@@ -64,8 +64,8 @@ WEIGHTS = {
 }
  
 
-TOP_K_ATTENDING     = 4   # matches shown per card for people attending tonight
-TOP_K_NOT_ATTENDING = 1   # extra matches with people who couldn't make it
+TOP_K_ATTENDING     = 5   # matches shown per card for people attending tonight
+TOP_K_NOT_ATTENDING = 0   # extra matches with people who couldn't make it
  
 EMBED_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 LABEL_MODEL      = "claude-sonnet-5"
@@ -150,15 +150,15 @@ N = len(people)
 n_attending = sum(1 for p in people if p["attending"])
  
 # Diagnose RSVP parsing so silent zero-attendance never happens again
-if col("rsvp"):
-    print(f"\nRSVP column: {col('rsvp')!r}")
-    print("Unique values found (count in brackets, tick = counted as attending):")
-    for val, count in df[col("rsvp")].value_counts(dropna=False).items():
-        attending = parse_rsvp(val)
-        mark = "\u2713" if attending else "\u2717"
-        print(f"  {mark}  {val!r:30s}  [{count}]")
-else:
-    print(f"\nNo RSVP column found (looking for {COLUMN_MAP['rsvp']!r}). All {N} people treated as attending.")
+# if col("rsvp"):
+#     print(f"\nRSVP column: {col('rsvp')!r}")
+#     print("Unique values found (count in brackets, tick = counted as attending):")
+#     for val, count in df[col("rsvp")].value_counts(dropna=False).items():
+#         attending = parse_rsvp(val)
+#         mark = "\u2713"
+#         print(f"  {mark}  {val!r:30s}  [{count}]")
+# else:
+#     print(f"\nNo RSVP column found (looking for {COLUMN_MAP['rsvp']!r}). All {N} people treated as attending.")
  
 print(f"\nLoaded {N} people ({n_attending} attending).")
  
@@ -389,7 +389,7 @@ with open(f"{OUTPUT_DIR}/match_cards.md", "w") as f:
         p = people[i]
         f.write(f"# {p['name']}\n*{p['institution']}*\n\n")
  
-        f.write(f"## Your top {TOP_K_ATTENDING} matches tonight\n\n")
+        f.write(f"## Your top {TOP_K_ATTENDING} matches \n\n")
         for j, score in top_attending[i]:
             write_match(f, i, j, score)
  
